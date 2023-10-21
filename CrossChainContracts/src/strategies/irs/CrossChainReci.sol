@@ -9,6 +9,12 @@ contract reciHello is IWormholeReceiver {
     address public wormholeRelayer;
     uint16 public targetChain;
     uint256 public GAS_LIMIT = 50000;
+    address public riveraVault;
+    address public token;
+
+    constructor(address _riveraVault) {
+        riveraVault = _riveraVault;
+    }
 
     function receiveWormholeMessages(
         bytes memory payload,
@@ -17,7 +23,7 @@ contract reciHello is IWormholeReceiver {
         uint16 sourceChain,
         bytes32 deliveryHash
     ) public payable override {
-        (string memory direction, address token) = abi.decode(
+        (string memory direction,  token) = abi.decode(
             payload,
             (string, address)
         );
@@ -29,5 +35,9 @@ contract reciHello is IWormholeReceiver {
         }
     }
 
-    function deployLiqui() internal {}
+    function deployLiqui() internal {
+         IERC20(token).approve(address(riveraVault), balH);
+
+        IRivera(riveraVault).deposit(balH, address(this));
+    }
 }
